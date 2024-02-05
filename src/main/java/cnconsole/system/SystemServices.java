@@ -1,14 +1,11 @@
 package cnconsole.system;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.Arrays;
 import java.util.Scanner;
+import java.util.concurrent.LinkedTransferQueue;
 
+import cnconsole.system.device.Device;
 import io.webfolder.curses4j.Curses;
 
 public class SystemServices {
@@ -27,7 +24,7 @@ public class SystemServices {
 		Scanner myReader = new Scanner(myObj);
 		String data = "";
 		while (myReader.hasNextLine()) {
-			data = data.concat(myReader.nextLine());
+			data = data.concat(myReader.nextLine() + "\n");
 		}
 		myReader.close();
 		return data;
@@ -35,28 +32,6 @@ public class SystemServices {
 
 	public String[] getargs() {
 		return args;
-	}
-
-	public Device openDevice(String deviceFileName) throws IOException {
-		File file = new File(deviceFileName);
-		Device dev = new Device();
-		dev.input = new FileInputStream(file);
-		dev.output = new FileOutputStream(file);
-		return dev;
-	}
-
-	public void writeToDevice(Device dev, String data) throws IOException {
-		dev.output.write(data.getBytes(Charset.defaultCharset()));
-	}
-
-	public String readFromDevice(Device dev) throws IOException {
-		int available = dev.input.available();
-		if (0 == available)
-			return null;
-		byte[] buf = new byte[1024];
-		int read = dev.input.read(buf);
-		byte[] arr = Arrays.copyOfRange(buf, 0, read);
-		return new String(arr);
 	}
 
 	public void initScreen() {
@@ -73,6 +48,16 @@ public class SystemServices {
 
 	public void writeAt(int row, int col, String string) {
 		Curses.mvprintw(row, col, "%s", string);
+	}
+
+	public void endUI() {
+		Curses.endwin();
+	}
+
+	public Device open(String path, String eventName,
+			LinkedTransferQueue<Event<String>> inputQueue)
+			throws FileNotFoundException {
+		return new Device(new File("testfifo"), "DEVICE", inputQueue);
 	}
 
 }

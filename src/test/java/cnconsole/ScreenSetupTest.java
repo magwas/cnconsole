@@ -52,7 +52,15 @@ class ScreenSetupTest {
 	@DisplayName("writes out the ascii art")
 	void test3() throws IOException {
 		app.screenSetup();
-		verify(sys).writeAt(HALF_SCREEN_WIDTH, RANDOM_LINENUMBER, RANDOM_LINE_OF_ASCII_ART);
+		verify(sys).writeAt(RANDOM_LINENUMBER, HALF_SCREEN_WIDTH,
+				RANDOM_LINE_OF_ASCII_ART);
+	}
+
+	@Test
+	@DisplayName("writes out the keybindings")
+	void test4() throws IOException {
+		app.screenSetup();
+		verify(sys).writeAt(2, 0, TestData.DESCRIPTION_OF_VALID_CONFIG_LINE);
 	}
 
 }

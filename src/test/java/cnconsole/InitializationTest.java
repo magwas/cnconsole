@@ -1,5 +1,7 @@
 package cnconsole;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -54,7 +56,7 @@ class InitializationTest {
 	@DisplayName("opens the device given as first argument in the command line")
 	void test5() throws IOException {
 		app.init();
-		verify(sys).openDevice(TestData.DEVICE);
+		verify(sys).open(eq(TestData.ARGS[0]), eq("DEVICE"), any());
 	}
 
 	@Test

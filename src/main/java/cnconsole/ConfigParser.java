@@ -23,7 +23,7 @@ public class ConfigParser {
 		Config config = new Config();
 		config.initGcodes = new ArrayList<String>();
 		config.commands = new ArrayList<Command>();
-		String[] splat = rcData.split("\n");
+		String[] splat = rcData.split("\\R");
 		for (String line : Arrays.asList(splat)) {
 			Command command = parseLine(line);
 			if (command.key == keycodes.get(KeyCodes.INIT))
