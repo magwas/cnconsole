@@ -5,7 +5,7 @@ import java.util.List;
 public class Command {
 
 	public int key;
-	public String comment;
+	public String description;
 	public List<String> gcode;
 
 }

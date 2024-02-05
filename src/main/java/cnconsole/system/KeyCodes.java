@@ -4,6 +4,8 @@ import java.util.HashMap;
 
 public class KeyCodes {
 
+	public static final String INIT = "INIT";
+
 	public HashMap<String, Integer> keycodes;
 
 	static KeyCodes instance;
@@ -17,6 +19,7 @@ public class KeyCodes {
 
 	KeyCodes() {
 		keycodes = new HashMap<String, Integer>();
+		keycodes.put(INIT, 0x1000);
 		keycodes.put("CODE_YES", 0x100);
 		keycodes.put("BREAK", 0x101);
 		keycodes.put("DOWN", 0x102);

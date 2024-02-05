@@ -17,21 +17,16 @@ class InitializationTest {
 
 	private SystemServices sys;
 	private App app;
+	private ConfigParser parser;
 
 	@BeforeEach
 	public void setUp() throws FileNotFoundException {
 		sys = mock(SystemServices.class);
+		parser = mock(ConfigParser.class);
 		when(sys.getargs()).thenReturn(TestData.ARGS);
 		when(sys.getHome()).thenReturn(TestData.USER_HOME);
 		when(sys.readfile(TestData.RCFILE)).thenReturn(TestData.RC_DATA);
-		app = new App(sys);
-	}
-
-	@Test
-	@DisplayName("initializes the ui")
-	void test() throws IOException {
-		app.init();
-		verify(sys).init();
+		app = new App(sys, parser);
 	}
 
 	@Test
@@ -60,6 +55,13 @@ class InitializationTest {
 	void test5() throws IOException {
 		app.init();
 		verify(sys).openDevice(TestData.DEVICE);
+	}
+
+	@Test
+	@DisplayName("parses the config")
+	void test6() throws IOException {
+		app.init();
+		verify(parser).parse(TestData.RC_DATA);
 	}
 
 }

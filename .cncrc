@@ -1,0 +1,3 @@
+INIT,init,G28,G21,G91
+HOME,auto-home,G28
+DOWN,backwards 10 um,G90,G0 Y-0.01,G91

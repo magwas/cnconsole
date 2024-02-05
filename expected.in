@@ -1,7 +1,12 @@
-(B)0[1;24r[m[?7h[H[JHOMEDIR
-this is the test file
-[param, param, pamparam]
-hello from test
+(B)0[1;24r[m[?7h[H[J[1;57H|[1B[5DZ: 000.00 mm[3;57H|    /[4;43HP: 000% |  Y: 000.00 mm[5;57H|  /[1B| /[7;41H------------------------X: 000.00 mm---[8;57HA[1B/|[1B/ |[1B/  |[11;67H[24;1H[?1l>
+
+
+screen set up
+home: /home/mag/eclipse-workspace/cnconsole
+from testfile: this is the test file
+args: [1.gcode]
+screen width: 80
+from device: hello from test through fifo
 testfifo
-this is the test fifo
+this is written by the device
 EOF

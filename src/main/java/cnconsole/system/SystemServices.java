@@ -18,14 +18,6 @@ public class SystemServices {
 		this.args = args;
 	}
 
-	public void init() {
-		Curses.initscr();
-	}
-
-	public void refresh() {
-		Curses.refresh();
-	}
-
 	public String getHome() {
 		return System.getProperty("user.home");
 	}
@@ -65,6 +57,22 @@ public class SystemServices {
 		int read = dev.input.read(buf);
 		byte[] arr = Arrays.copyOfRange(buf, 0, read);
 		return new String(arr);
+	}
+
+	public void initScreen() {
+		Curses.initscr();
+	}
+
+	public void refresh() {
+		Curses.refresh();
+	}
+
+	public int getScreenWidth() {
+		return Curses.COLS();
+	}
+
+	public void writeAt(int row, int col, String string) {
+		Curses.mvprintw(row, col, "%s", string);
 	}
 
 }
