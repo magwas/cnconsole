@@ -1,13 +1,12 @@
 package cnconsole.system;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.channels.FileChannel;
-import java.nio.file.OpenOption;
-import java.nio.file.StandardOpenOption;
+import java.nio.charset.Charset;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Scanner;
 
 import io.webfolder.curses4j.Curses;
@@ -23,12 +22,16 @@ public class SystemServices {
 		Curses.initscr();
 	}
 
+	public void refresh() {
+		Curses.refresh();
+	}
+
 	public String getHome() {
 		return System.getProperty("user.home");
 	}
 
 	public String readfile(String file) throws FileNotFoundException {
-		File myObj = new File("filename.txt");
+		File myObj = new File(file);
 		Scanner myReader = new Scanner(myObj);
 		String data = "";
 		while (myReader.hasNextLine()) {
@@ -42,11 +45,26 @@ public class SystemServices {
 		return args;
 	}
 
-	public FileChannel openDevice(String deviceFileName) throws IOException {
+	public Device openDevice(String deviceFileName) throws IOException {
 		File file = new File(deviceFileName);
-		HashSet<OpenOption> opts = new HashSet<OpenOption>(Arrays.asList(
-				new OpenOption[] { StandardOpenOption.DSYNC, StandardOpenOption.READ, StandardOpenOption.WRITE }));
-		return FileChannel.open(file.toPath(), opts);
+		Device dev = new Device();
+		dev.input = new FileInputStream(file);
+		dev.output = new FileOutputStream(file);
+		return dev;
+	}
+
+	public void writeToDevice(Device dev, String data) throws IOException {
+		dev.output.write(data.getBytes(Charset.defaultCharset()));
+	}
+
+	public String readFromDevice(Device dev) throws IOException {
+		int available = dev.input.available();
+		if (0 == available)
+			return null;
+		byte[] buf = new byte[1024];
+		int read = dev.input.read(buf);
+		byte[] arr = Arrays.copyOfRange(buf, 0, read);
+		return new String(arr);
 	}
 
 }
