@@ -9,12 +9,12 @@ import cnconsole.system.Event;
 
 public class DeviceParser extends Thread {
 
-	private LinkedTransferQueue<Event<String>> inQueue;
+	private LinkedTransferQueue<String> inQueue;
 	LinkedTransferQueue<Event<?>> outQueue;
 	HashMap<Pattern, String> matches = new HashMap<Pattern, String>();
 	private Posters posters;
 
-	public DeviceParser(LinkedTransferQueue<Event<String>> inQueue,
+	public DeviceParser(LinkedTransferQueue<String> inQueue,
 			LinkedTransferQueue<Event<?>> outQueue) {
 		this.inQueue = inQueue;
 		this.outQueue = outQueue;
@@ -31,7 +31,7 @@ public class DeviceParser extends Thread {
 	}
 
 	public void loop() {
-		Event<String> currentEvent;
+		String currentEvent;
 		try {
 			currentEvent = inQueue.take();
 		} catch (InterruptedException e) {
@@ -40,7 +40,7 @@ public class DeviceParser extends Thread {
 			outQueue.put(failEvent);
 			return;
 		}
-		for (String line : currentEvent.value.split("\n")) {
+		for (String line : currentEvent.split("\n")) {
 			checkPatterns(matches, line);
 		}
 	}

@@ -15,15 +15,13 @@ class DeviceParserTest {
 	@DisplayName("coordinate update results in a COORDINATES")
 	void test() throws InterruptedException {
 		String line = "X:0.00 Y:127.2 Z:145.14 E:0.00 Count X: 0 Y:10160 Z:116000\nok";
-		LinkedTransferQueue<Event<String>> inQueue = new LinkedTransferQueue<Event<String>>();
+		LinkedTransferQueue<String> inQueue = new LinkedTransferQueue<String>();
 		LinkedTransferQueue<Event<?>> outQueue = new LinkedTransferQueue<Event<?>>();
 		DeviceParser parser = new DeviceParser(inQueue, outQueue);
 		parser.start();
 
-		Event<String> event = new Event<String>(null, line);
-		inQueue.add(event);
-		Event<String> event2 = new Event<String>(null, "some garbage");
-		inQueue.add(event2);
+		inQueue.add(line);
+		inQueue.add("some garbage");
 
 		@SuppressWarnings("unchecked")
 		Event<Float[]> outEvent = (Event<Float[]>) outQueue.take();

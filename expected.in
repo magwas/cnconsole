@@ -6,7 +6,7 @@ init: [G28, G21, G91]
 home: /home/mag/eclipse-workspace/cnconsole
 from testfile: this is the test file
 
-args: [1.gcode]
+args: [testpty]
 screen width: 80
-from device: FIFO: this is written by the device
-hello from test through fifo
+from device: DEVICE: this is written by the device
+

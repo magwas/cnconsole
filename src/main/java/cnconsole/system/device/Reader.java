@@ -15,12 +15,16 @@ class Reader extends Thread {
 	@Override
 	public void run() {
 		while (this.device.isopen) {
-			loop();
+			try {
+				loop();
+			} catch (InterruptedException e) {
+				System.err.println("reader loop: " + e);
+			}
 		}
 
 	}
 
-	public void loop() {
+	public void loop() throws InterruptedException {
 		byte[] readBuf = new byte[1024];
 		int read;
 		Event<String> event = new Event<String>();
@@ -35,6 +39,6 @@ class Reader extends Thread {
 		byte[] arr = Arrays.copyOfRange(readBuf, 0, read);
 		event.name = this.device.eventName;
 		event.value = new String(arr);
-		this.device.inputQueue.add(event);
+		this.device.inputQueue.transfer(event);
 	}
 }

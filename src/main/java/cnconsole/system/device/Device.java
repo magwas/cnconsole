@@ -26,6 +26,7 @@ public class Device {
 	public Device(File file, String eventName,
 			LinkedTransferQueue<Event<String>> inputQueue)
 			throws FileNotFoundException {
+
 		this.inputQueue = inputQueue;
 		this.eventName = eventName;
 		input = new FileInputStream(file);

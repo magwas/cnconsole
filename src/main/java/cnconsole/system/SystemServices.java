@@ -57,7 +57,8 @@ public class SystemServices {
 	public Device open(String path, String eventName,
 			LinkedTransferQueue<Event<String>> inputQueue)
 			throws FileNotFoundException {
-		return new Device(new File("testfifo"), "DEVICE", inputQueue);
+
+		return new Device(new File(path), "DEVICE", inputQueue);
 	}
 
 }
