@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import cnconsole.data.Command;
+import cnconsole.data.Config;
 import cnconsole.system.KeyCodes;
 
 public class ConfigParser {
@@ -22,34 +24,33 @@ public class ConfigParser {
 	public Config parse(String rcData) {
 		Config config = new Config();
 		config.initGcodes = new ArrayList<String>();
-		config.commands = new ArrayList<Command>();
+		config.commands = new HashMap<Integer, Command>();
 		String[] splat = rcData.split("\\R");
 		for (String line : Arrays.asList(splat)) {
-			Command command = parseLine(line);
-			if (command.key == keycodes.get(KeyCodes.INIT))
-				config.initGcodes = command.gcode;
-			else
-				config.commands.add(command);
+			parseLine(config, line);
 		}
 		return config;
 	}
 
-	public Command parseLine(String line) {
+	public void parseLine(Config config, String line) {
 		Command command = new Command();
 		String[] parts = parseParts(line);
 		Integer keyCode = parseKey(parts);
-		command.key = keyCode;
 		command.description = parts[0] + ": " + parts[1];
-		parseGcode(command, parts);
-		return command;
+		command.gcode = parseGcode(parts);
+		if (keyCode == keycodes.get(KeyCodes.INIT))
+			config.initGcodes = command.gcode;
+		else
+			config.commands.put(keyCode, command);
 	}
 
-	public void parseGcode(Command command, String[] parts) {
-		command.gcode = new ArrayList<String>();
-		String[] gcodes = parts[2].split(",");
-		for (String gcode : Arrays.asList(gcodes)) {
-			command.gcode.add(gcode);
+	public ArrayList<String> parseGcode(String[] parts) {
+		ArrayList<String> gcode = new ArrayList<String>();
+		String[] codes = parts[2].split(",");
+		for (String code : Arrays.asList(codes)) {
+			gcode.add(code);
 		}
+		return gcode;
 	}
 
 	public Integer parseKey(String[] parts) {

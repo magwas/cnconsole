@@ -1,9 +1,9 @@
-package cnconsole;
+package cnconsole.deviceparser;
 
 import java.util.concurrent.LinkedTransferQueue;
 import java.util.regex.Matcher;
 
-import cnconsole.system.Event;
+import cnconsole.data.Event;
 
 class Posters {
 	LinkedTransferQueue<Event<?>> outQueue;

@@ -1,11 +1,11 @@
-package cnconsole;
+package cnconsole.display;
 
 public class Constants {
 	public static String[] ART = {
-			"                |         ",
+			"idle            |         ",
 			"            Z: 000.00 mm   ",
 			"                |    /    ",
-			"  P: 000%       |  Y: 000.00 mm",
+			"  P: 000%%       |  Y: 000.00 mm",
 			"                |  /      ",
 			"                | /       ",
 			"------------------------X: 000.00 mm---",

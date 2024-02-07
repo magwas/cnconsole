@@ -3,42 +3,42 @@ package cnconsole.system.device;
 import java.io.IOException;
 import java.util.Arrays;
 
-import cnconsole.system.Event;
+import cnconsole.App;
+import cnconsole.data.Event;
+import cnconsole.system.SystemServices;
 
 class Reader extends Thread {
 	private final Device device;
+	private App app;
+	private SystemServices sys;
 
-	Reader(Device device) {
+	Reader(App app, SystemServices sys, Device device) {
+		this.app = app;
 		this.device = device;
+		this.sys = sys;
 	}
 
 	@Override
 	public void run() {
+		sys.writetoConsole("Reader thread started");
 		while (this.device.isopen) {
 			try {
 				loop();
-			} catch (InterruptedException e) {
-				System.err.println("reader loop: " + e);
+			} catch (InterruptedException | IOException e) {
+				app.panic("device.Reader", e);
 			}
 		}
 
 	}
 
-	public void loop() throws InterruptedException {
+	public void loop() throws InterruptedException, IOException {
 		byte[] readBuf = new byte[1024];
-		int read;
+		int read = 0;
 		Event<String> event = new Event<String>();
-		try {
-			read = this.device.input.read(readBuf);
-		} catch (IOException e) {
-			this.device.isopen = false;
-			event.name = Device.CLOSED;
-			this.device.inputQueue.add(event);
-			return;
-		}
+		read = device.input.read(readBuf);
 		byte[] arr = Arrays.copyOfRange(readBuf, 0, read);
 		event.name = this.device.eventName;
 		event.value = new String(arr);
-		this.device.inputQueue.transfer(event);
+		this.device.fromDevice.transfer(event);
 	}
 }

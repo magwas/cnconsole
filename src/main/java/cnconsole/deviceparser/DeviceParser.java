@@ -1,23 +1,33 @@
-package cnconsole;
+package cnconsole.deviceparser;
 
 import java.util.HashMap;
 import java.util.concurrent.LinkedTransferQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import cnconsole.system.Event;
+import cnconsole.App;
+import cnconsole.data.Event;
+import cnconsole.system.SystemServices;
 
 public class DeviceParser extends Thread {
 
-	private LinkedTransferQueue<String> inQueue;
+	public static final String OK = "OK";
+	public static final String COORDINATES = "COORDINATES";
+	private LinkedTransferQueue<Event<String>> inQueue;
 	LinkedTransferQueue<Event<?>> outQueue;
 	HashMap<Pattern, String> matches = new HashMap<Pattern, String>();
 	private Posters posters;
+	private App app;
+	private boolean isRunning;
+	private SystemServices sys;
 
-	public DeviceParser(LinkedTransferQueue<String> inQueue,
+	public DeviceParser(App app, SystemServices sys,
+			LinkedTransferQueue<Event<String>> inQueue,
 			LinkedTransferQueue<Event<?>> outQueue) {
 		this.inQueue = inQueue;
 		this.outQueue = outQueue;
+		this.app = app;
+		this.sys = sys;
 		posters = new Posters(outQueue);
 		initializeMatches();
 
@@ -25,22 +35,22 @@ public class DeviceParser extends Thread {
 
 	@Override
 	public void run() {
-		while (true) {
+		isRunning = true;
+		sys.writetoConsole("DeviceParser started");
+		while (isRunning) {
 			loop();
 		}
 	}
 
 	public void loop() {
-		String currentEvent;
+		Event<String> currentEvent = null;
 		try {
 			currentEvent = inQueue.take();
 		} catch (InterruptedException e) {
-			Event<InterruptedException> failEvent = new Event<InterruptedException>(
-					"FAIL", e);
-			outQueue.put(failEvent);
-			return;
+			app.panic("DeviceParser", e);
 		}
-		for (String line : currentEvent.split("\n")) {
+		sys.writetoConsole("DeviceParser: " + currentEvent.value);
+		for (String line : currentEvent.value.split("\n")) {
 			checkPatterns(matches, line);
 		}
 	}
@@ -49,8 +59,8 @@ public class DeviceParser extends Thread {
 		matches.put(
 				Pattern.compile(
 						".*X:(?<X>[\\w\\.]+) Y:(?<Y>[\\w\\.]+) Z:(?<Z>[\\w\\.]+).*"),
-				"COORDINATES");
-		matches.put(Pattern.compile("ok"), "OK");
+				COORDINATES);
+		matches.put(Pattern.compile("ok"), OK);
 	}
 
 	public void checkPatterns(HashMap<Pattern, String> matches, String line) {
@@ -58,15 +68,19 @@ public class DeviceParser extends Thread {
 			Matcher match = pat.matcher(line);
 			if (match.matches()) {
 				switch (matches.get(pat)) {
-				case "COORDINATES":
+				case COORDINATES:
 					posters.postCoordinates(match);
 					return;
-				case "OK":
+				case OK:
 					posters.postOk();
 					return;
 				}
 			}
 		}
 		posters.postUnparsed(line);
+	}
+
+	public void cease() {
+		isRunning = false;
 	}
 }

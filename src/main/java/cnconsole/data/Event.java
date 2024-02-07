@@ -1,4 +1,4 @@
-package cnconsole.system;
+package cnconsole.data;
 
 public class Event<T> {
 	public Event(String name, T value) {

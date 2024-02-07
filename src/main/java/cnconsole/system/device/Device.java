@@ -1,21 +1,22 @@
 package cnconsole.system.device;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.concurrent.LinkedTransferQueue;
 
-import cnconsole.system.Event;
+import cnconsole.App;
+import cnconsole.data.Event;
+import cnconsole.system.SystemServices;
 
 public class Device {
 	public static final String CLOSED = "CLOSED";
 
-	LinkedTransferQueue<Event<String>> inputQueue;
-	LinkedTransferQueue<String> outputQueue = new LinkedTransferQueue<String>();
-	FileInputStream input;
-	FileOutputStream output;
+	public LinkedTransferQueue<Event<String>> fromDevice;
+	public LinkedTransferQueue<String> toDevice = new LinkedTransferQueue<String>();
+	InputStream input;
+	OutputStream output;
 	boolean isopen = true;
 	String eventName;
 
@@ -23,18 +24,25 @@ public class Device {
 
 	private Thread reader;
 
-	public Device(File file, String eventName,
+	public Device(App app, SystemServices sys, String path, String eventName,
 			LinkedTransferQueue<Event<String>> inputQueue)
 			throws FileNotFoundException {
 
-		this.inputQueue = inputQueue;
+		this.fromDevice = inputQueue;
 		this.eventName = eventName;
-		input = new FileInputStream(file);
-		output = new FileOutputStream(file);
-		writer = new Writer(this);
+		input = sys.getInputStream(path);
+		output = sys.getOutputStream(path);
+		writer = new Writer(app, sys, this);
+		reader = new Reader(app, sys, this);
+	}
+
+	public void start() {
 		writer.start();
-		reader = new Reader(this);
 		reader.start();
+	}
+
+	public void cease() {
+		isopen = false;
 	}
 
 	public void close() {
@@ -46,6 +54,6 @@ public class Device {
 	public void write(String data) throws IOException {
 		if (!isopen)
 			throw new IOException("this device is closed");
-		outputQueue.add(data);
+		toDevice.add(data);
 	}
 }
